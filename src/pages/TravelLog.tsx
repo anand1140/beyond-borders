@@ -46,7 +46,7 @@ export default function TravelLog() {
 
   const travelLog = useQuery(
     api.travelLogs.getTravelLog,
-    id ? { id: id as Id<"travelLogs"> } : "skip"
+    user && id ? { id: id as Id<"travelLogs"> } : "skip"
   );
   
   const addDestination = useMutation(api.destinations.addDestination);
