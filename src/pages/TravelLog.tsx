@@ -216,6 +216,11 @@ export default function TravelLog() {
             onMapClick={handleMapClick}
             onDestinationClick={setSelectedDestination}
             isAddingMode={isAddingDestination}
+            pendingLatLng={
+              newDestination.lat && newDestination.lng
+                ? { lat: newDestination.lat, lng: newDestination.lng }
+                : undefined
+            }
           />
           
           {isAddingDestination && (

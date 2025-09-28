@@ -25,6 +25,7 @@ interface InteractiveMapProps {
   onMapClick?: (lat: number, lng: number) => void;
   onDestinationClick?: (destination: Destination) => void;
   isAddingMode?: boolean;
+  pendingLatLng?: { lat: number; lng: number };
 }
 
 function MapClickHandler({ onMapClick, isAddingMode }: { onMapClick?: (lat: number, lng: number) => void; isAddingMode?: boolean }) {
@@ -43,6 +44,7 @@ export default function InteractiveMap({
   onMapClick,
   onDestinationClick,
   isAddingMode = false,
+  pendingLatLng,
 }: InteractiveMapProps) {
   const mapRef = useRef<L.Map>(null);
 
@@ -82,6 +84,17 @@ export default function InteractiveMap({
         />
         
         <MapClickHandler onMapClick={onMapClick} isAddingMode={isAddingMode} />
+        
+        {isAddingMode && pendingLatLng && (
+          <Marker position={[pendingLatLng.lat, pendingLatLng.lng]}>
+            <Popup>
+              <div className="p-2">
+                <h4 className="font-semibold">New destination</h4>
+                <p className="text-sm text-gray-600 mt-1">Finish details in the form to save.</p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
         
         {destinations.map((destination) => (
           <Marker
