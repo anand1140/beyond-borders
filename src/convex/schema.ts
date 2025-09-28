@@ -32,12 +32,38 @@ const schema = defineSchema(
       role: v.optional(roleValidator), // role of the user. do not remove
     }).index("email", ["email"]), // index for the email. do not remove or modify
 
-    // add other tables here
+    // Travel logs table
+    travelLogs: defineTable({
+      userId: v.id("users"),
+      title: v.string(),
+      description: v.optional(v.string()),
+      startDate: v.optional(v.number()),
+      endDate: v.optional(v.number()),
+      isActive: v.boolean(), // whether this log is currently being edited
+    }).index("by_user", ["userId"]),
 
-    // tableName: defineTable({
-    //   ...
-    //   // table fields
-    // }).index("by_field", ["field"])
+    // Destinations/markers within travel logs
+    destinations: defineTable({
+      travelLogId: v.id("travelLogs"),
+      userId: v.id("users"),
+      name: v.string(),
+      latitude: v.number(),
+      longitude: v.number(),
+      notes: v.optional(v.string()),
+      visitedDate: v.optional(v.number()),
+      photos: v.optional(v.array(v.string())), // array of photo URLs
+      category: v.optional(v.string()), // e.g., "restaurant", "attraction", "hotel"
+    })
+      .index("by_travel_log", ["travelLogId"])
+      .index("by_user", ["userId"]),
+
+    // Chat messages for the WanderBot
+    chatMessages: defineTable({
+      userId: v.id("users"),
+      message: v.string(),
+      isBot: v.boolean(),
+      timestamp: v.number(),
+    }).index("by_user", ["userId"]),
   },
   {
     schemaValidation: false,
