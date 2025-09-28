@@ -82,8 +82,18 @@ export default function WanderBotChat({
   };
 
   const generateBotResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
+    const lowerMessage = userMessage.toLowerCase().trim();
+
+    // Quick guidance for app-specific help
+    if (
+      lowerMessage.includes("add place") ||
+      lowerMessage.includes("add location") ||
+      lowerMessage.includes("marker") ||
+      lowerMessage.includes("pin")
+    ) {
+      return "To add a place: Click 'Add Place' → click on the map to auto-fill name and coordinates → add notes/category on the left → 'Add to Log'.";
+    }
+
     if (lowerMessage.includes("hello") || lowerMessage.includes("hi")) {
       return "Hello! I'm WanderBot, your travel companion. I can help you discover amazing places, plan your trips, and answer questions about destinations around the world. What would you like to explore today?";
     }
@@ -104,20 +114,61 @@ export default function WanderBotChat({
       return "Tokyo is an incredible blend of tradition and modernity! 🇯🇵\n\n🏯 **Senso-ji Temple** - Ancient Buddhist temple\n🌸 **Shibuya Crossing** - World's busiest intersection\n🍣 **Tsukiji Outer Market** - Fresh sushi and street food\n🏮 **Asakusa** - Traditional district\n🌆 **Tokyo Skytree** - Panoramic city views\n\nDon't miss trying authentic ramen and visiting during cherry blossom season (March-May)!";
     }
     
-    if (lowerMessage.includes("budget") || lowerMessage.includes("cheap")) {
+    if (
+      lowerMessage.includes("budget") ||
+      lowerMessage.includes("cheap") ||
+      lowerMessage.includes("affordable")
+    ) {
       return "Great question! Here are some budget-friendly travel tips:\n\n💰 **Accommodation**: Consider hostels, guesthouses, or Airbnb\n🍜 **Food**: Try local street food and markets\n🚌 **Transport**: Use public transportation\n🎫 **Activities**: Look for free walking tours and museums\n📱 **Apps**: Use travel apps for deals and discounts\n\nWould you like specific budget recommendations for a particular destination?";
     }
     
-    if (lowerMessage.includes("weather") || lowerMessage.includes("climate")) {
+    if (
+      lowerMessage.includes("weather") ||
+      lowerMessage.includes("climate") ||
+      lowerMessage.includes("best time")
+    ) {
       return "Weather can make or break a trip! Here's what to consider:\n\n☀️ **Research seasonal patterns** for your destination\n🌡️ **Pack accordingly** - layers are your friend\n🌧️ **Check forecasts** before departure\n❄️ **Consider off-season travel** for better prices\n\nWhich destination are you planning to visit? I can give you specific weather insights!";
+    }
+
+    if (
+      lowerMessage.includes("itinerary") ||
+      lowerMessage.includes("plan") ||
+      lowerMessage.includes("days")
+    ) {
+      return "I can help plan an itinerary! Tell me: destination, number of days, and your travel style (culture, food, nature, nightlife). I'll suggest a day-by-day plan.";
+    }
+
+    if (
+      lowerMessage.includes("visa") ||
+      lowerMessage.includes("passport") ||
+      lowerMessage.includes("entry")
+    ) {
+      return "Visa requirements vary by nationality and destination. Check your destination country's official immigration website or IATA Travel Centre. Tell me your nationality and destination, and I'll point you to the right resource.";
+    }
+
+    if (
+      lowerMessage.includes("safety") ||
+      lowerMessage.includes("safe") ||
+      lowerMessage.includes("scam")
+    ) {
+      return "General safety tips: keep valuables minimal, use registered taxis, avoid poorly lit areas late at night, and keep digital copies of documents. For destination-specific advice, tell me where you're going.";
+    }
+
+    if (
+      lowerMessage.includes("food") ||
+      lowerMessage.includes("restaurant") ||
+      lowerMessage.includes("cafe") ||
+      lowerMessage.includes("eat")
+    ) {
+      return "I'd love to recommend food spots! Let me know your destination and cuisine preference (local, vegetarian, street food, cafes, fine dining).";
     }
     
     // Default responses
     const defaultResponses = [
-      "That's an interesting question! I'd love to help you explore that destination. Could you tell me more about what specifically you'd like to know?",
-      "I'm here to help with your travel planning! Whether you need destination recommendations, travel tips, or local insights, just ask away.",
-      "Travel is all about discovery! What kind of experience are you looking for - adventure, relaxation, culture, or something else?",
-      "I can help you with destination guides, travel tips, local recommendations, and planning advice. What would you like to explore?",
+      "I can help with itineraries, tips, and destination ideas. Tell me your destination and how many days you have.",
+      "What destination are you considering? I can suggest must-see spots, local food, and the best time to visit.",
+      "Share your travel style (adventure, culture, food, chill), and I'll tailor recommendations.",
+      "Ask about visas, budgets, packing, or safety—happy to help you plan a smooth trip!",
     ];
     
     return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];

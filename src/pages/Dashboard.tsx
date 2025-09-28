@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/convex/_generated/api";
 import { useQuery, useMutation } from "convex/react";
 import { motion } from "framer-motion";
-import { MapPin, Plus, Calendar, MessageCircle } from "lucide-react";
+import { MapPin, Plus, Calendar, MessageCircle, Compass } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import CreateTravelLogDialog from "@/components/CreateTravelLogDialog";
@@ -43,13 +43,18 @@ export default function Dashboard() {
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img
-              src="/logo.svg"
-              alt="Beyond Borders"
-              className="h-8 w-8 cursor-pointer"
+            <div
+              className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center cursor-pointer"
               onClick={() => navigate("/")}
-            />
-            <h1 className="text-xl font-bold tracking-tight">Beyond Borders</h1>
+            >
+              <Compass className="h-5 w-5 text-primary" />
+            </div>
+            <h1
+              className="text-xl font-bold tracking-tight cursor-pointer"
+              onClick={() => navigate("/")}
+            >
+              Beyond Borders
+            </h1>
           </div>
           
           <div className="flex items-center gap-4">
