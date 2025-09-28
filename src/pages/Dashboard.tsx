@@ -17,7 +17,7 @@ export default function Dashboard() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showChat, setShowChat] = useState(false);
   
-  const travelLogs = useQuery(api.travelLogs.getUserTravelLogs);
+  const travelLogs = useQuery(api.travelLogs.getUserTravelLogs, user ? {} : "skip");
   const createSampleData = useMutation(api.travelLogs.createSampleData);
 
   // Add sample data handler
