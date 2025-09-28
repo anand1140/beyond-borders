@@ -65,7 +65,13 @@ export default function TravelLog() {
 
   const handleMapClick = (lat: number, lng: number) => {
     if (isAddingDestination) {
-      setNewDestination(prev => ({ ...prev, lat, lng }));
+      setNewDestination(prev => ({
+        ...prev,
+        lat,
+        lng,
+        // Auto-fill a name using coordinates if none is set
+        name: prev.name?.trim() ? prev.name : `${lat.toFixed(5)}, ${lng.toFixed(5)}`
+      }));
     }
   };
 
@@ -224,59 +230,7 @@ export default function TravelLog() {
           />
           
           {isAddingDestination && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="absolute top-4 left-4 right-4 z-10"
-            >
-              <Card className="bg-white/95 backdrop-blur-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Add New Destination</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="dest-name">Place Name *</Label>
-                    <Input
-                      id="dest-name"
-                      placeholder="e.g., Hadimba Temple"
-                      value={newDestination.name}
-                      onChange={(e) => setNewDestination(prev => ({ ...prev, name: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="dest-category">Category</Label>
-                    <Input
-                      id="dest-category"
-                      placeholder="e.g., Temple, Restaurant, Hotel"
-                      value={newDestination.category}
-                      onChange={(e) => setNewDestination(prev => ({ ...prev, category: e.target.value }))}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="dest-notes">Notes</Label>
-                    <Textarea
-                      id="dest-notes"
-                      placeholder="Add your thoughts about this place..."
-                      value={newDestination.notes}
-                      onChange={(e) => setNewDestination(prev => ({ ...prev, notes: e.target.value }))}
-                      rows={2}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button onClick={handleAddDestination} className="flex-1">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Destination
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsAddingDestination(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+            null
           )}
         </div>
 
@@ -291,6 +245,91 @@ export default function TravelLog() {
               <span className="font-medium">{travelLog.destinations?.length || 0}</span> destinations added
             </div>
           </div>
+
+          {/* Add New Destination form (shown when adding mode is active) */}
+          {isAddingDestination && (
+            <div className="p-6 border-b space-y-4">
+              <h4 className="font-medium">Add New Destination</h4>
+              <div>
+                <Label htmlFor="add-name">Place Name *</Label>
+                <Input
+                  id="add-name"
+                  placeholder="Auto-filled from map click"
+                  value={newDestination.name}
+                  onChange={(e) =>
+                    setNewDestination((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <Label>Latitude</Label>
+                  <Input
+                    readOnly
+                    value={
+                      newDestination.lat !== undefined
+                        ? newDestination.lat.toFixed(5)
+                        : ""
+                    }
+                    placeholder="Click map"
+                  />
+                </div>
+                <div>
+                  <Label>Longitude</Label>
+                  <Input
+                    readOnly
+                    value={
+                      newDestination.lng !== undefined
+                        ? newDestination.lng.toFixed(5)
+                        : ""
+                    }
+                    placeholder="Click map"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="add-category">Category</Label>
+                <Input
+                  id="add-category"
+                  placeholder="e.g., Temple, Restaurant, Hotel"
+                  value={newDestination.category}
+                  onChange={(e) =>
+                    setNewDestination((prev) => ({ ...prev, category: e.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="add-notes">Notes</Label>
+                <Textarea
+                  id="add-notes"
+                  placeholder="Add your thoughts about this place..."
+                  value={newDestination.notes}
+                  onChange={(e) =>
+                    setNewDestination((prev) => ({ ...prev, notes: e.target.value }))
+                  }
+                  rows={3}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleAddDestination} className="flex-1">
+                  <Save className="h-4 w-4 mr-2" />
+                  Add to Log
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddingDestination(false);
+                    setNewDestination({ name: "", notes: "", category: "" });
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Tip: Click on the map to auto-fill the coordinates and name.
+              </p>
+            </div>
+          )}
 
           <ScrollArea className="h-[calc(100vh-200px)]">
             <div className="p-6 space-y-4">
