@@ -8,7 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { api } from "@/convex/_generated/api";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Send, Bot, User, Trash2 } from "lucide-react";
@@ -30,6 +30,10 @@ export default function WanderBotChat({
   const messages = useQuery(api.chat.getChatMessages);
   const addMessage = useMutation(api.chat.addChatMessage);
   const clearHistory = useMutation(api.chat.clearChatHistory);
+  const generateReply = useAction(api.ai.generateWanderBotReply); // Add AI action
+
+  // Track greeting to avoid duplicates
+  const greetedRef = useRef(false);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -37,6 +41,28 @@ export default function WanderBotChat({
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Auto-greet when the dialog opens and there is no history
+  useEffect(() => {
+    const greet = async () => {
+      if (!open) return;
+      if (messages === undefined) return; // wait for load
+      if (greetedRef.current) return;
+      if (messages.length > 0) return;
+
+      greetedRef.current = true;
+      try {
+        await addMessage({
+          message:
+            "Hello! I'm WanderBot, your travel companion. Ask me about destinations, itineraries, budgets, or app help (like adding places to your log). Where are you headed?",
+          isBot: true,
+        });
+      } catch {
+        // ignore toast here to keep first impression clean
+      }
+    };
+    void greet();
+  }, [open, messages, addMessage]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,21 +79,17 @@ export default function WanderBotChat({
         isBot: false,
       });
 
-      // Simulate bot response (in a real app, this would call an AI service)
-      const botResponse = generateBotResponse(userMessage);
-      
-      // Add bot response after a short delay
-      setTimeout(async () => {
-        await addMessage({
-          message: botResponse,
-          isBot: true,
-        });
-        setIsLoading(false);
-      }, 1000);
+      // Generate AI response via backend action
+      const botResponse = await generateReply({ userMessage });
 
+      await addMessage({
+        message: botResponse,
+        isBot: true,
+      });
     } catch (error) {
       toast.error("Failed to send message");
       console.error(error);
+    } finally {
       setIsLoading(false);
     }
   };
