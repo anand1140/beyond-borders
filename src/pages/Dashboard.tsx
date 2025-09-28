@@ -96,7 +96,7 @@ export default function Dashboard() {
           transition={{ delay: 0.1 }}
           className="mb-8"
         >
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <Button
               onClick={() => setShowCreateDialog(true)}
               className="gap-2 h-12 px-6"

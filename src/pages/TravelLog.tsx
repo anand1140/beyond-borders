@@ -214,9 +214,9 @@ export default function TravelLog() {
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-73px)]">
+      <div className="flex flex-col md:flex-row h-auto md:h-[calc(100vh-73px)]">
         {/* Map Section */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative h-[50vh] md:h-auto">
           <InteractiveMap
             destinations={travelLog.destinations || []}
             onMapClick={handleMapClick}
@@ -235,7 +235,7 @@ export default function TravelLog() {
         </div>
 
         {/* Sidebar */}
-        <div className="w-80 border-l bg-muted/30">
+        <div className="w-full md:w-80 border-t md:border-l bg-muted/30">
           <div className="p-6 border-b">
             <h3 className="font-semibold mb-2">Trip Details</h3>
             <p className="text-sm text-muted-foreground">
@@ -331,7 +331,7 @@ export default function TravelLog() {
             </div>
           )}
 
-          <ScrollArea className="h-[calc(100vh-200px)]">
+          <ScrollArea className="h-[calc(100vh-200px)] md:h-[calc(100vh-200px)]">
             <div className="p-6 space-y-4">
               <h4 className="font-medium">Destinations</h4>
               
