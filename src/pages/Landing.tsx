@@ -243,7 +243,9 @@ export default function Landing() {
       <footer className="border-t py-12 px-6">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <img src="/logo.svg" alt="Beyond Borders" className="h-6 w-6" />
+            <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center">
+              <Compass className="h-4 w-4 text-primary" />
+            </div>
             <span className="font-semibold">Beyond Borders</span>
           </div>
           <p className="text-muted-foreground">
