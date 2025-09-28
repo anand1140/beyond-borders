@@ -35,6 +35,32 @@ function RouteSyncer() {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
+  // Set favicon to Compass icon and override any existing favicon
+  useEffect(() => {
+    const href = "/compass.svg";
+    const ensureFavicon = () => {
+      let link = document.querySelector('link[rel="icon"]') as HTMLLinkElement | null;
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+      }
+      link.type = "image/svg+xml";
+      link.href = href;
+
+      // Also set shortcut icon for broader browser support
+      let shortcut = document.querySelector('link[rel="shortcut icon"]') as HTMLLinkElement | null;
+      if (!shortcut) {
+        shortcut = document.createElement("link");
+        shortcut.rel = "shortcut icon";
+        document.head.appendChild(shortcut);
+      }
+      shortcut.type = "image/svg+xml";
+      shortcut.href = href;
+    };
+    ensureFavicon();
+  }, []);
+
   // Remove "Powered by Vly/Vli" badges injected by the host on deploy
   useEffect(() => {
     const removeBadge = () => {
