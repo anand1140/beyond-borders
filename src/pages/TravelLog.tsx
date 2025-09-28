@@ -53,6 +53,11 @@ export default function TravelLog() {
   const updateDestination = useMutation(api.destinations.updateDestination);
   const deleteDestination = useMutation(api.destinations.deleteDestination);
 
+  const destinations = useQuery(
+    api.destinations.getDestinations,
+    user && id ? { travelLogId: id as Id<"travelLogs"> } : "skip"
+  );
+
   if (!user) {
     navigate("/auth");
     return null;
@@ -218,7 +223,7 @@ export default function TravelLog() {
         {/* Map Section */}
         <div className="flex-1 relative h-[50vh] md:h-auto">
           <InteractiveMap
-            destinations={travelLog.destinations || []}
+            destinations={destinations || []}
             onMapClick={handleMapClick}
             onDestinationClick={setSelectedDestination}
             isAddingMode={isAddingDestination}
@@ -242,7 +247,7 @@ export default function TravelLog() {
               {travelLog.description || "No description added yet."}
             </p>
             <div className="mt-4 text-sm">
-              <span className="font-medium">{travelLog.destinations?.length || 0}</span> destinations added
+              <span className="font-medium">{destinations?.length || 0}</span> destinations added
             </div>
           </div>
 
@@ -335,7 +340,12 @@ export default function TravelLog() {
             <div className="p-6 space-y-4">
               <h4 className="font-medium">Destinations</h4>
               
-              {!travelLog.destinations || travelLog.destinations.length === 0 ? (
+              {destinations === undefined ? (
+                <div className="text-center py-8">
+                  <MapPin className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">Loading destinations...</p>
+                </div>
+              ) : !destinations || destinations.length === 0 ? (
                 <div className="text-center py-8">
                   <MapPin className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                   <p className="text-sm text-muted-foreground">
@@ -343,7 +353,7 @@ export default function TravelLog() {
                   </p>
                 </div>
               ) : (
-                travelLog.destinations.map((destination) => (
+                destinations.map((destination) => (
                   <motion.div
                     key={destination._id}
                     initial={{ opacity: 0, y: 10 }}
