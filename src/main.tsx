@@ -35,6 +35,31 @@ function RouteSyncer() {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
+  // Remove "Powered by Vly/Vli" badges injected by the host on deploy
+  useEffect(() => {
+    const removeBadge = () => {
+      const nodes = Array.from(document.querySelectorAll("a, div, span")) as HTMLElement[];
+      for (const el of nodes) {
+        const text = (el.innerText || "").toLowerCase();
+        const href = (el as HTMLAnchorElement).href || "";
+        const hasPoweredText = text.includes("powered by") && (text.includes("vly") || text.includes("vli"));
+        const hasVlyHref = href.includes("vly") || href.includes("vli");
+        if (hasPoweredText || hasVlyHref) {
+          const style = window.getComputedStyle(el);
+          if (style.position === "fixed") {
+            el.remove();
+          }
+        }
+      }
+    };
+    const t1 = setTimeout(removeBadge, 0);
+    const t2 = setTimeout(removeBadge, 1500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
+
   return null;
 }
 
