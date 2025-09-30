@@ -44,6 +44,12 @@ export default function TravelLog() {
     category: "",
   });
 
+  // Reset add mode and pending draft whenever we enter this page or id changes
+  useEffect(() => {
+    setIsAddingDestination(false);
+    setNewDestination({ name: "", notes: "", category: "" });
+  }, [id]);
+
   const travelLog = useQuery(
     api.travelLogs.getTravelLog,
     user && id ? { id: id as Id<"travelLogs"> } : "skip"
@@ -98,6 +104,7 @@ export default function TravelLog() {
       });
 
       toast.success("Destination added successfully!");
+      // Ensure add mode fully resets to avoid map capturing clicks later
       setIsAddingDestination(false);
       setNewDestination({ name: "", notes: "", category: "" });
     } catch (error) {
@@ -323,6 +330,7 @@ export default function TravelLog() {
                 <Button
                   variant="outline"
                   onClick={() => {
+                    // Explicitly exit add mode and clear pending pin
                     setIsAddingDestination(false);
                     setNewDestination({ name: "", notes: "", category: "" });
                   }}
