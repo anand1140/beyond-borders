@@ -395,8 +395,10 @@ export default function TravelLog() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
+                              // Explicitly open the edit dialog
                               setSelectedDestination(destination);
                             }}
+                            aria-label="Edit destination"
                           >
                             <Edit3 className="h-3 w-3" />
                           </Button>
