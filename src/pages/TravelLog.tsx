@@ -137,6 +137,8 @@ export default function TravelLog() {
   };
 
   const handleDeleteDestination = async (destinationId: Id<"destinations">) => {
+    const ok = window.confirm("Delete this destination? This cannot be undone.");
+    if (!ok) return;
     try {
       await deleteDestination({ id: destinationId });
       toast.success("Destination deleted successfully!");
@@ -414,8 +416,6 @@ export default function TravelLog() {
                               className="text-destructive hover:text-destructive"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const ok = window.confirm(`Delete "${destination.name}"? This cannot be undone.`);
-                                if (!ok) return;
                                 void handleDeleteDestination(destination._id);
                               }}
                               onMouseDown={(e) => e.stopPropagation()}
@@ -491,7 +491,9 @@ export default function TravelLog() {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => handleDeleteDestination(selectedDestination._id)}
+                onClick={() => {
+                  void handleDeleteDestination(selectedDestination._id);
+                }}
                 className="text-destructive hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
