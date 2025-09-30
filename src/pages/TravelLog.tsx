@@ -375,7 +375,10 @@ export default function TravelLog() {
                       }`}
                       onClick={() => setSelectedDestination(destination)}
                     >
-                      <CardContent className="p-4">
+                      <CardContent
+                        className="p-4"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <h5 className="font-medium">{destination.name}</h5>
@@ -395,7 +398,6 @@ export default function TravelLog() {
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              // Explicitly open the edit dialog
                               setSelectedDestination(destination);
                             }}
                             aria-label="Edit destination"
@@ -420,11 +422,15 @@ export default function TravelLog() {
           animate={{ opacity: 1 }}
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedDestination(null)}
+          onMouseDown={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             className="bg-background rounded-lg p-6 w-full max-w-md"
           >
             <h3 className="text-lg font-semibold mb-4">Edit Destination</h3>
