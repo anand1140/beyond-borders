@@ -16,7 +16,8 @@ import {
   Trash2, 
   Calendar,
   MessageCircle,
-  Edit3
+  Edit3,
+  X
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { useState, useEffect } from "react";
@@ -379,9 +380,9 @@ export default function TravelLog() {
                         className="p-4"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h5 className="font-medium">{destination.name}</h5>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h5 className="font-medium truncate">{destination.name}</h5>
                             {destination.category && (
                               <span className="text-xs bg-muted px-2 py-1 rounded-full mt-1 inline-block">
                                 {destination.category}
@@ -393,17 +394,37 @@ export default function TravelLog() {
                               </p>
                             )}
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedDestination(destination);
-                            }}
-                            aria-label="Edit destination"
-                          >
-                            <Edit3 className="h-3 w-3" />
-                          </Button>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedDestination(destination);
+                              }}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              aria-label="Edit destination"
+                            >
+                              <Edit3 className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const ok = window.confirm(`Delete "${destination.name}"? This cannot be undone.`);
+                                if (!ok) return;
+                                void handleDeleteDestination(destination._id);
+                              }}
+                              onMouseDown={(e) => e.stopPropagation()}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              aria-label="Delete destination"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
