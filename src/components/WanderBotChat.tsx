@@ -80,12 +80,14 @@ export default function WanderBotChat({
       });
 
       // Pass full chat history to AI for context (filter to only required fields)
+      const chatHistoryForAI = (messages || []).map(msg => ({
+        message: msg.message,
+        isBot: msg.isBot
+      }));
+      
       const botResponse = await generateReply({ 
         userMessage,
-        chatHistory: (messages || []).map(msg => ({
-          message: msg.message,
-          isBot: msg.isBot
-        }))
+        chatHistory: chatHistoryForAI
       });
 
       await addMessage({
@@ -93,8 +95,8 @@ export default function WanderBotChat({
         isBot: true,
       });
     } catch (error) {
-      toast.error("Failed to send message");
-      console.error(error);
+      console.error("WanderBot error:", error);
+      toast.error("Failed to send message. Check console for details.");
     } finally {
       setIsLoading(false);
     }
