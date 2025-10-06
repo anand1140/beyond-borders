@@ -30,7 +30,7 @@ export default function WanderBotChat({
   const messages = useQuery(api.chat.getChatMessages);
   const addMessage = useMutation(api.chat.addChatMessage);
   const clearHistory = useMutation(api.chat.clearChatHistory);
-  const generateReply = useAction(api.ai.generateWanderBotReply); // Add AI action
+  const generateReply = useAction(api.ai.generateWanderBotReply);
 
   // Track greeting to avoid duplicates
   const greetedRef = useRef(false);
@@ -79,8 +79,11 @@ export default function WanderBotChat({
         isBot: false,
       });
 
-      // Generate AI response via backend action
-      const botResponse = await generateReply({ userMessage });
+      // Pass full chat history to AI for context
+      const botResponse = await generateReply({ 
+        userMessage,
+        chatHistory: messages || []
+      });
 
       await addMessage({
         message: botResponse,

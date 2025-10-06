@@ -6,6 +6,12 @@ import { v } from "convex/values";
 export const generateWanderBotReply = action({
   args: {
     userMessage: v.string(),
+    chatHistory: v.array(
+      v.object({
+        message: v.string(),
+        isBot: v.boolean(),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -33,6 +39,19 @@ export const generateWanderBotReply = action({
     }
 
     try {
+      // Convert chat history to OpenAI message format
+      const messages = [
+        { role: "system" as const, content: systemPrompt },
+        ...args.chatHistory.map((msg) => ({
+          role: (msg.isBot ? "assistant" : "user") as "assistant" | "user",
+          content: msg.message,
+        })),
+        {
+          role: "user" as const,
+          content: args.userMessage.trim(),
+        },
+      ];
+
       const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -42,18 +61,10 @@ export const generateWanderBotReply = action({
           "X-Title": "Beyond Borders Travel App",
         },
         body: JSON.stringify({
-          // Use a more capable model - Claude 3.5 Sonnet is excellent for complex queries
-          // Fallback chain: Claude 3.5 Sonnet → GPT-4 → Gemini Pro
           model: "anthropic/claude-3.5-sonnet",
-          messages: [
-            { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: args.userMessage.trim(),
-            },
-          ],
+          messages,
           temperature: 0.7,
-          max_tokens: 800, // Increased for more detailed responses
+          max_tokens: 800,
           top_p: 1,
         }),
       });
@@ -73,10 +84,7 @@ export const generateWanderBotReply = action({
           },
           body: JSON.stringify({
             model: "openai/gpt-4-turbo",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: args.userMessage.trim() },
-            ],
+            messages,
             temperature: 0.7,
             max_tokens: 800,
           }),
