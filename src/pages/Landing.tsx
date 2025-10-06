@@ -119,7 +119,7 @@ export default function Landing() {
               {
                 icon: Camera,
                 title: "Rich Memories",
-                description: "Add photos, notes, and detailed descriptions to each destination you visit."
+                description: "Add notes, categories, and detailed descriptions to each destination you visit."
               },
               {
                 icon: MessageCircle,
