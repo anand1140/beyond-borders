@@ -15,6 +15,7 @@ export const generateWanderBotReply = action({
   },
   handler: async (ctx, args) => {
     const apiKey = process.env.OPENROUTER_API_KEY;
+    
     const systemPrompt =
       "You are WanderBot, an expert travel companion and advisor. You provide detailed, accurate travel information including:\n" +
       "- Destination recommendations with specific places, activities, and hidden gems\n" +
@@ -25,10 +26,12 @@ export const generateWanderBotReply = action({
       "- App-specific help for adding places to travel logs\n\n" +
       "Be conversational, enthusiastic, and thorough. Use emojis sparingly for visual appeal. " +
       "When users ask complex questions, provide comprehensive answers with multiple perspectives. " +
-      "Format longer responses with clear sections and bullet points for readability.";
+      "Format longer responses with clear sections and bullet points for readability. " +
+      "Always maintain context from previous messages in the conversation.";
 
     // Graceful fallback if no key configured
     if (!apiKey) {
+      console.warn("OpenRouter API key not configured");
       return (
         "I'm running in demo mode. Add an OpenRouter API key to enable real AI responses.\n\n" +
         "Meanwhile, here are some helpful tips:\n" +
@@ -39,24 +42,26 @@ export const generateWanderBotReply = action({
     }
 
     try {
-      // Convert chat history to OpenAI message format
+      // Build messages array with proper structure
       const messages = [
-        { role: "system" as const, content: systemPrompt },
+        { role: "system", content: systemPrompt },
         ...args.chatHistory.map((msg) => ({
-          role: (msg.isBot ? "assistant" : "user") as "assistant" | "user",
+          role: msg.isBot ? "assistant" : "user",
           content: msg.message,
         })),
         {
-          role: "user" as const,
+          role: "user",
           content: args.userMessage.trim(),
         },
       ];
 
-      const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      console.log("Sending request to OpenRouter with", messages.length, "messages");
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
+          "Authorization": `Bearer ${apiKey}`,
           "HTTP-Referer": "https://beyond-borders.app",
           "X-Title": "Beyond Borders Travel App",
         },
@@ -69,16 +74,17 @@ export const generateWanderBotReply = action({
         }),
       });
 
-      if (!resp.ok) {
-        const text = await resp.text().catch(() => "");
-        console.error(`OpenRouter error: ${resp.status} ${text}`);
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "");
+        console.error(`OpenRouter primary model error: ${response.status} - ${errorText}`);
         
-        // If Claude fails, try GPT-4 as fallback
-        const fallbackResp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        // Try fallback model
+        console.log("Attempting fallback to GPT-4 Turbo");
+        const fallbackResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
+            "Authorization": `Bearer ${apiKey}`,
             "HTTP-Referer": "https://beyond-borders.app",
             "X-Title": "Beyond Borders Travel App",
           },
@@ -90,24 +96,39 @@ export const generateWanderBotReply = action({
           }),
         });
 
-        if (!fallbackResp.ok) {
+        if (!fallbackResponse.ok) {
+          const fallbackError = await fallbackResponse.text().catch(() => "");
+          console.error(`OpenRouter fallback error: ${fallbackResponse.status} - ${fallbackError}`);
           throw new Error("Both primary and fallback models failed");
         }
 
-        const fallbackData = await fallbackResp.json();
-        return (
-          fallbackData?.choices?.[0]?.message?.content?.trim() ||
-          "I couldn't generate a response right now. Please try again."
-        );
+        const fallbackData = await fallbackResponse.json();
+        const fallbackContent = fallbackData?.choices?.[0]?.message?.content?.trim();
+        
+        if (!fallbackContent) {
+          throw new Error("No content in fallback response");
+        }
+        
+        console.log("Fallback model succeeded");
+        return fallbackContent;
       }
 
-      const data = await resp.json();
-      const content =
-        data?.choices?.[0]?.message?.content?.trim() ||
-        "I couldn't generate a response right now. Please try again.";
+      const data = await response.json();
+      const content = data?.choices?.[0]?.message?.content?.trim();
+      
+      if (!content) {
+        console.error("No content in response:", JSON.stringify(data));
+        throw new Error("Empty response from AI");
+      }
+      
+      console.log("Primary model succeeded");
       return content;
+      
     } catch (err) {
       console.error("AI generation error:", err);
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      console.error("Error details:", errorMessage);
+      
       return (
         "I had trouble connecting to the AI service. Please try again shortly.\n\n" +
         "Quick help:\n" +
