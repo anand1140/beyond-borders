@@ -79,10 +79,13 @@ export default function WanderBotChat({
         isBot: false,
       });
 
-      // Pass full chat history to AI for context
+      // Pass full chat history to AI for context (filter to only required fields)
       const botResponse = await generateReply({ 
         userMessage,
-        chatHistory: messages || []
+        chatHistory: (messages || []).map(msg => ({
+          message: msg.message,
+          isBot: msg.isBot
+        }))
       });
 
       await addMessage({
